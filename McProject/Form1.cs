@@ -30,15 +30,16 @@ namespace McProject
             button5.Enabled = false;
             button6.Enabled = false;
             button7.Enabled = false;
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
             dataGridView1.AllowUserToAddRows = false;
             dataGridView1.AllowUserToDeleteRows = false;
             dataGridView1.ReadOnly = true;
             dataGridView1.RowHeadersVisible = false;
             dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right | AnchorStyles.Left;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
             dataGridView1.Rows.Clear();
             dataGridView1.Columns.Clear();
             dataGridView1.Columns.Add("column1", "Название блюда с нулевой калорийностью");
@@ -55,7 +56,21 @@ namespace McProject
 
         private void button3_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(f.SugarsCalories[0][1]);
+            dataGridView1.Rows.Clear();
+            dataGridView1.Columns.Clear();
+            dataGridView1.Columns.Add("column1", "Категория");
+            dataGridView1.Columns.Add("column2", "Блюдо");
+            dataGridView1.Columns.Add("column3", "Калории");
+            dataGridView1.Columns.Add("column4", "Сахар");
+            dataGridView1.Columns.Add("column5", "Размер порции");
+            dataGridView1.Columns["column1"].Width = 100;
+            dataGridView1.Columns["column2"].Width = 300;
+            dataGridView1.Columns["column3"].Width = 80;
+            dataGridView1.Columns["column4"].Width = 50;
+            dataGridView1.Columns["column5"].Width = 100;
+            foreach (string[] item in f.SugarsCalories) {
+                dataGridView1.Rows.Add(item[0], item[1], item[2], item[3], item[4]);
+            }
         }
 
         private void button4_Click(object sender, EventArgs e)
