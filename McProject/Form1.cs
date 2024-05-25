@@ -12,6 +12,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using System.Globalization;
 using System.Net.NetworkInformation;
+using System.Diagnostics.Eventing.Reader;
 
 namespace McProject
 {
@@ -27,24 +28,33 @@ namespace McProject
             button3.Enabled = false;    
             button4.Enabled = false;
             button5.Enabled = false;
+            button6.Enabled = false;
+            button7.Enabled = false;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            
-            MessageBox.Show(f.ZeroCaloriesList[0]);
+            dataGridView1.AllowUserToAddRows = false;
+            dataGridView1.AllowUserToDeleteRows = false;
+            dataGridView1.ReadOnly = true;
+            dataGridView1.RowHeadersVisible = false;
+            dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right | AnchorStyles.Left;
+            dataGridView1.Rows.Clear();
+            dataGridView1.Columns.Clear();
+            dataGridView1.Columns.Add("column1", "Название блюда с нулевой калорийностью");
+            dataGridView1.Columns["column1"].Width = 300;
+            foreach (string item in f.ZeroCaloriesList) { 
+                dataGridView1.Rows.Add(item);
+            }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-
-            MessageBox.Show(f.CountMcChicken);
-            MessageBox.Show(f.McChickenGramms);
+            MessageBox.Show($"Чтобы получить суточную норму железа нужно купить {f.CountMcChicken} макчикенов, или {f.McChickenGramms} грамм!", "McChickens", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-
             MessageBox.Show(f.SugarsCalories[0][1]);
         }
 
@@ -89,12 +99,15 @@ namespace McProject
                     f.GetSugarsCalories();
                     f.GetTransFatsItems();
                     f.GetMidleTransInBeefPork();
+                    f.DieticalFoodForEachCategory();
                     button8.Text = "Выбранный файл: " + filePath;
                     button1.Enabled = true;
                     button2.Enabled = true;
                     button3.Enabled = true;
                     button4.Enabled = true;
                     button5.Enabled = true;
+                    button6.Enabled = true; 
+                    button7.Enabled = true;
                 }
                 catch (Exception ex)
                 {
@@ -110,6 +123,23 @@ namespace McProject
                 
             }
         }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            // график столбчатый по калорийности (диетическая еда в каждой категории)
+           
+            
+
+            Form2 form = new Form2(f.CaloriesPercentsCategoryes, f.Categorues);
+            form.ShowDialog();
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            // кружок (высокобелковая пища по всем категориям)
+            Form3 form = new Form3();
+            form.ShowDialog();
+        }
     }
     public class Funcs
     {
@@ -123,6 +153,10 @@ namespace McProject
         public List<string[]> TransItems;
 
         public string relation;
+
+        public List<double> CaloriesPercentsCategoryes;
+        public List<string> Categorues;
+
         enum fields : int
         {
             Category,
@@ -257,7 +291,47 @@ namespace McProject
             relation = rel.ToString(CultureInfo.InvariantCulture);
         }
 
+        public void DieticalFoodForEachCategory() {
 
+            List<double> percents = new List<double>();
+            List<string> categories = new List<string>(); 
+            string temp_category = data[0][(int)fields.Category];
+            double allproductsincategory = 0;
+            double dieticalproductsincategory = 0;
+
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                string category = data[i][(int)fields.Category];
+
+                if (category != temp_category) {
+                    
+                    categories.Add(temp_category);
+                    temp_category = category;
+                    double gg = (dieticalproductsincategory / allproductsincategory) * 100;
+                    percents.Add(Math.Round(gg));
+                    
+                    allproductsincategory = 0;
+                    dieticalproductsincategory = 0;
+                } 
+
+                allproductsincategory++;
+
+
+                double p = (double.Parse(data[i][(int)fields.CaloriesFromFat]) + 1) / (double.Parse(data[i][(int)fields.Calories])+1);
+                if (p<0.4) {
+                    dieticalproductsincategory++;
+                }
+
+                if (i == data.Length-1) { 
+                    percents.Add((dieticalproductsincategory / allproductsincategory) * 100);
+                    categories.Add(category);
+                }
+            }
+
+            CaloriesPercentsCategoryes = percents;
+            Categorues = categories;
+        }
     }
 
     
