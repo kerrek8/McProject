@@ -115,11 +115,11 @@
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(12, 391);
+            this.button6.Location = new System.Drawing.Point(12, 386);
             this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(324, 32);
+            this.button6.Size = new System.Drawing.Size(324, 37);
             this.button6.TabIndex = 10;
-            this.button6.Text = "button6";
+            this.button6.Text = "График с процентами диетических блюд в каждой категории";
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
@@ -129,7 +129,7 @@
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(324, 31);
             this.button7.TabIndex = 11;
-            this.button7.Text = "button7";
+            this.button7.Text = "график с распределением блюд по содержанию белка";
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
             // 

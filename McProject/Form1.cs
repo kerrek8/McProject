@@ -366,13 +366,18 @@ namespace McProject
         {
             Dictionary<string, int> highproteinproducts = new Dictionary<string, int>() {
                 {"allproducts", 0},
-                {"highprotein", 0}
+                {"highprotein", 0},
+                {"midprotein", 0}
             };
             
             foreach (string[] d in data) {
                 highproteinproducts["allproducts"]++;
-                if ((double.Parse(d[(int)fields.Protein]) * 20) > double.Parse(d[(int)fields.Calories])) {
+
+
+                if ((double.Parse(d[(int)fields.Protein]) * 20) >= double.Parse(d[(int)fields.Calories])) {
                     highproteinproducts["highprotein"]++;
+                } else if ((double.Parse(d[(int)fields.Protein])*50) > double.Parse(d[(int)fields.Calories])) {
+                    highproteinproducts["midprotein"]++;
                 }
             }
             Highproteinproducts = highproteinproducts;

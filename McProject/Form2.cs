@@ -58,5 +58,10 @@ namespace McProject
             series.Points[8].Color = System.Drawing.Color.DeepSkyBlue;
             chart1.Legends[0].Enabled = false;
         }
+
+        private void Form2_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
