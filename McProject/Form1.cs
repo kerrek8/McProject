@@ -75,15 +75,25 @@ namespace McProject
 
         private void button4_Click(object sender, EventArgs e)
         {
-
-            MessageBox.Show(f.TransItems[0][1]);
+            dataGridView1.Rows.Clear();
+            dataGridView1.Columns.Clear();
+            dataGridView1.Columns.Add("column1", "Категория");
+            dataGridView1.Columns.Add("column2", "Блюдо");
+            dataGridView1.Columns.Add("column3", "Транс-жиры");
+            dataGridView1.Columns.Add("column4", "Размер порции");
+            dataGridView1.Columns["column1"].Width = 120;
+            dataGridView1.Columns["column2"].Width = 300;
+            dataGridView1.Columns["column3"].Width = 80;
+            dataGridView1.Columns["column4"].Width = 100;
+            foreach (string[] item in f.TransItems)
+            {
+                dataGridView1.Rows.Add(item[0], item[1], item[2], item[3]);
+            }
         }
 
         private void button5_Click(object sender, EventArgs e)
         {
-
-            MessageBox.Show(f.relation);
-
+            MessageBox.Show($"Средняя доля транс-жиров в категории Beef & Pork составляет {f.relation}%", "McTrans", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
 
@@ -115,6 +125,7 @@ namespace McProject
                     f.GetTransFatsItems();
                     f.GetMidleTransInBeefPork();
                     f.DieticalFoodForEachCategory();
+                    f.HighProteinProductsCount();
                     button8.Text = "Выбранный файл: " + filePath;
                     button1.Enabled = true;
                     button2.Enabled = true;
@@ -152,7 +163,7 @@ namespace McProject
         private void button7_Click(object sender, EventArgs e)
         {
             // кружок (высокобелковая пища по всем категориям)
-            Form3 form = new Form3();
+            Form3 form = new Form3(f.Highproteinproducts);
             form.ShowDialog();
         }
     }
@@ -171,6 +182,8 @@ namespace McProject
 
         public List<double> CaloriesPercentsCategoryes;
         public List<string> Categorues;
+
+        public Dictionary<string, int> Highproteinproducts;
 
         enum fields : int
         {
@@ -303,6 +316,7 @@ namespace McProject
             }
             double rel = sum10 / sum3;
             rel = Math.Round(rel, 4);
+            rel = rel * 100;
             relation = rel.ToString(CultureInfo.InvariantCulture);
         }
 
@@ -346,6 +360,22 @@ namespace McProject
 
             CaloriesPercentsCategoryes = percents;
             Categorues = categories;
+        }
+
+        public void HighProteinProductsCount()
+        {
+            Dictionary<string, int> highproteinproducts = new Dictionary<string, int>() {
+                {"allproducts", 0},
+                {"highprotein", 0}
+            };
+            
+            foreach (string[] d in data) {
+                highproteinproducts["allproducts"]++;
+                if ((double.Parse(d[(int)fields.Protein]) * 20) > double.Parse(d[(int)fields.Calories])) {
+                    highproteinproducts["highprotein"]++;
+                }
+            }
+            Highproteinproducts = highproteinproducts;
         }
     }
 

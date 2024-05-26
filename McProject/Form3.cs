@@ -7,14 +7,30 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace McProject
 {
     public partial class Form3 : Form
     {
-        public Form3()
+        public Form3(Dictionary<string, int> proteinproducts)
         {
             InitializeComponent();
+            InitializeChart(proteinproducts);
+            
+        }
+        private void InitializeChart(Dictionary<string, int> dict) {
+            chart1.Dock = DockStyle.Fill;
+            chart1.Series.Clear();
+            chart1.Titles.Add("Количество высокобелковых продуктов: ");
+
+            Series series = chart1.Series.Add("Высокобелковые продукты");
+            series.ChartType = SeriesChartType.Pie;
+            series.IsValueShownAsLabel = true;
+            var lowprotein = dict["allproducts"] - dict["highprotein"];
+            series.Points.AddXY("Низкобелковые продукты", lowprotein);
+            series.Points.AddXY("Высокобелковые продукты", dict["highprotein"]);
+            
         }
     }
 }

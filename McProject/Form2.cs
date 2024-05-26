@@ -20,6 +20,7 @@ namespace McProject
             
         }
         private void InitializeChart(List<double> list, List<string> categories) {
+            chart1.Dock = DockStyle.Fill;
             chart1.Series.Clear();
             chart1.Titles.Add("Процент диетических продуктов в каждой категории:");
 
