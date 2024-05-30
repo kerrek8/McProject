@@ -174,7 +174,7 @@ namespace McProject
                     f.GetData(filePath);
                     f.DieticalFoodForEachCategory();
                     f.HighProteinProductsCount();
-                    foreach (string u in f.uniccategories) {
+                    foreach (string u in f.Categories) {
                         listBox1.Items.Add(u);
                         listBox6.Items.Add(u);
                     }
@@ -234,7 +234,7 @@ namespace McProject
            
             
 
-            Form2 form = new Form2(f.CaloriesPercentsCategoryes, f.Categorues);
+            Form2 form = new Form2(f.CaloriesPercentsCategoryes, f.Categories);
             form.ShowDialog();
         }
 
@@ -255,6 +255,8 @@ namespace McProject
             for (int i = 0; i<f.data.Length; i++) {
                 dataGridView1.Rows.Add(f.data[i]);
             }
+           
+
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -265,6 +267,7 @@ namespace McProject
                 listBox2.Enabled = true;
                 listBox3.Enabled = true;
                 listBox2.Items.Clear();
+                listBox3.Items.Clear();
                 foreach (string[] d in f.data) {
                     if (d[0] == selectedItem) {
                         listBox2.Items.Add(d[1]);
@@ -339,25 +342,29 @@ namespace McProject
     }
     public class Funcs
     {
-        public List<string> dailycategories;
-        public List<string> notdailycategories;
 
-        public List<string> uniccategories;
-        public string[] cat;
-        public string[][] data;
-        public List<string> ZeroCaloriesList;
-        public string CountMcChicken;
-        public string McChickenGramms;
+        public List<string> dailycategories;// все характеристики где есть (% daily)
+        public List<string> notdailycategories; // все характеристики где нет (% daily)
 
-        public List<string[]> SugarsCalories;
-        public List<string[]> TransItems;
+        public List<string> Categories; // категории самих товаров 
 
-        public string relation;
 
-        public List<double> CaloriesPercentsCategoryes;
-        public List<string> Categorues;
+        public string[] cat; // все характеристики
+        public string[][] data; // распаршеный файл
+        public List<string> ZeroCaloriesList; // список с продуктами с указанной калорийностью
+        public string CountMcChicken; // количество указанного товара чтобы закрыть дневную потребность указанной характеристики
+        public string McChickenGramms; // количество грамм указанного товары чтобы закрыть дневную потребность указанной характеристики
 
-        public Dictionary<string, int> Highproteinproducts;
+        public List<string[]> SugarsCalories; //
+        public List<string[]> TransItems; //
+
+        public string relation; // отношение суммы столбца 10 к сумме столбца 3 в выбранной категории
+
+        public List<double> CaloriesPercentsCategoryes; //  список с процентами по категориям для графика
+        
+        public Dictionary<string, int> Highproteinproducts; // проценты продуктов по содержанию белка
+
+        
 
         enum fields : int
         {
@@ -411,16 +418,13 @@ namespace McProject
             cat = c;
 
 
-            List<string> unic = new List<string>();
+
             for (int i = 1; i < f.Length; i++)
             {
                 
                 f_splitted[i - 1] = Regex.Split(f[i], pattern);
-                if (!unic.Contains(f_splitted[i-1][(int)fields.Category])) {
-                    unic.Add(f_splitted[i - 1][(int)fields.Category]);
-                }
+                
             }
-            uniccategories = unic;
             data = f_splitted;
         }
 
@@ -441,7 +445,7 @@ namespace McProject
         }
 
         public void GetMcChickenValues(string item, string far) {
-            // TODO: переделать
+            
             string pattern = @"\((\d+)\s*[^\)]+\)";
             for (int i = 0; i < data.Length; i++)
             {
@@ -452,9 +456,18 @@ namespace McProject
 
                     CountMcChicken = cnt.ToString();
                     Match match = Regex.Match(data[i][(int)fields.ServingSize], pattern);
-                    int need = int.Parse(match.Groups[1].Value);
-                    McChickenGramms = (need * cnt).ToString();
-                    break;
+                    if (match.Groups.Count > 1)
+                    {
+                        int need = int.Parse(match.Groups[1].Value);
+                        McChickenGramms = (need * cnt).ToString();
+                        break;
+                    }
+                    else {
+                        double need = 28.35 * double.Parse(data[i][(int)fields.ServingSize].Substring(0, data[i][(int)fields.ServingSize].IndexOf("fl")), CultureInfo.InvariantCulture);
+                        McChickenGramms = (need * cnt).ToString();
+                        break;
+                    }
+                    
                 }
             }
         }
@@ -506,16 +519,29 @@ namespace McProject
             double sum10 = 0;
             double sum3 = 0;
             string pattern = @"\((\d+)\s*[^\)]+\)";
+            
             foreach (string[] d in data) {
                 if (d[(int)fields.Category] == c) 
                 {
+                    
                     sum10 += double.Parse(d[(int)fields.TransFat], CultureInfo.InvariantCulture);
-                    // TODO: обработка товаров где нет грамм
+                    
                     Match match = Regex.Match(d[(int)fields.ServingSize], pattern);
-                    double s3 = double.Parse(match.Groups[1].Value);
-                    sum3 += s3;
+                    if (match.Groups.Count > 1)
+                    {
+                        double s3 = double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
+                        sum3 += s3;
+                    }
+                    else {
+
+                        double s3 = 28.35 * double.Parse(d[(int)fields.ServingSize].Substring(0, d[(int)fields.ServingSize].IndexOf("fl")), CultureInfo.InvariantCulture);
+                        sum3 += s3;
+                    }
+                    
                 }
+
             }
+
             double rel = sum10 / sum3;
             rel = Math.Round(rel, 4);
             rel = rel * 100;
@@ -561,7 +587,7 @@ namespace McProject
             }
 
             CaloriesPercentsCategoryes = percents;
-            Categorues = categories;
+            Categories = categories;
         }
 
         public void HighProteinProductsCount()
